@@ -1,0 +1,5 @@
+# nix build
+/result
+# zig build
+/zig-cache
+/zig-out
