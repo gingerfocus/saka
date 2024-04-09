@@ -14,7 +14,7 @@
     utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
       packages = with pkgs; [
-        yacc
+        openpam
         libxcrypt
       ];
 
@@ -29,10 +29,10 @@
 
           buildInputs = packages;
           buildPhase = "${pkgs.zig}/bin/zig build --prefix $out --cache-dir /build/zig-cache --global-cache-dir /build/global-cache";
-          # installPhase = ''
-          #   mkdir -p $out/bin
-          #   cp doas $out/bin
-          # '';
+          installPhase = ''
+            chown root:root $out/bin/saka
+            chmod 4755 $out/bin/saka
+          '';
 
           meta = {
             maintainers = ["Evan Stokdyk <evan.stokdyk@gmail.com>"];

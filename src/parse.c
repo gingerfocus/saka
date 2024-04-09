@@ -85,6 +85,9 @@
 
 #include "doas.h"
 
+// #include "parse.h"
+
+
 typedef struct {
 	union {
 		struct {
@@ -110,8 +113,6 @@ static size_t maxrules;
 
 int parse_errors = 0;
 
-static void yyerror(const char *, ...);
-static int yylex(void);
 
 static size_t
 arraylen(const char **arr)
@@ -205,13 +206,20 @@ typedef int YYSTYPE;
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
-
 extern YYSTYPE yylval;
 
+void
+yyerror(const char *fmt, ...)
+{
+	va_list va;
 
-int yyparse (void);
-
-
+	fprintf(stderr, "doas: ");
+	va_start(va, fmt);
+	vfprintf(stderr, fmt, va);
+	va_end(va);
+	fprintf(stderr, " at line %d\n", yylval.lineno + 1);
+	parse_errors++;
+}
 
 /* Symbol kind.  */
 enum yysymbol_kind_t
@@ -962,8 +970,149 @@ YYSTYPE yylval;
 /* Number of syntax errors so far.  */
 int yynerrs;
 
+static struct keyword {
+	const char *word;
+	int token;
+} keywords[] = {
+	{ "deny", TDENY },
+	{ "permit", TPERMIT },
+	{ "as", TAS },
+	{ "cmd", TCMD },
+	{ "args", TARGS },
+	{ "nopass", TNOPASS },
+	{ "nolog", TNOLOG },
+	{ "persist", TPERSIST },
+	{ "keepenv", TKEEPENV },
+	{ "setenv", TSETENV },
+};
 
+int
+yylex(void)
+{
+	char buf[1024], *ebuf, *p, *str;
+	int c, quotes = 0, escape = 0, qpos = -1, nonkw = 0;
+	size_t i;
 
+	p = buf;
+	ebuf = buf + sizeof(buf);
+
+repeat:
+	/* skip whitespace first */
+	for (c = getc(yyfp); c == ' ' || c == '\t'; c = getc(yyfp))
+		yylval.colno++;
+
+	/* check for special one-character constructions */
+	switch (c) {
+		case '\n':
+			yylval.colno = 0;
+			yylval.lineno++;
+			/* FALLTHROUGH */
+		case '{':
+		case '}':
+			return c;
+		case '#':
+			/* skip comments; NUL is allowed; no continuation */
+			while ((c = getc(yyfp)) != '\n')
+				if (c == EOF)
+					goto eof;
+			yylval.colno = 0;
+			yylval.lineno++;
+			return c;
+		case EOF:
+			goto eof;
+	}
+
+	/* parsing next word */
+	for (;; c = getc(yyfp), yylval.colno++) {
+		switch (c) {
+		case '\0':
+			yyerror("unallowed character NUL in column %d",
+			    yylval.colno + 1);
+			escape = 0;
+			continue;
+		case '\\':
+			escape = !escape;
+			if (escape)
+				continue;
+			break;
+		case '\n':
+			if (quotes)
+				yyerror("unterminated quotes in column %d",
+				    qpos + 1);
+			if (escape) {
+				nonkw = 1;
+				escape = 0;
+				yylval.colno = 0;
+				yylval.lineno++;
+				continue;
+			}
+			goto eow;
+		case EOF:
+			if (escape)
+				yyerror("unterminated escape in column %d",
+				    yylval.colno);
+			if (quotes)
+				yyerror("unterminated quotes in column %d",
+				    qpos + 1);
+			goto eow;
+			/* FALLTHROUGH */
+		case '{':
+		case '}':
+		case '#':
+		case ' ':
+		case '\t':
+			if (!escape && !quotes)
+				goto eow;
+			break;
+		case '"':
+			if (!escape) {
+				quotes = !quotes;
+				if (quotes) {
+					nonkw = 1;
+					qpos = yylval.colno;
+				}
+				continue;
+			}
+		}
+		*p++ = c;
+		if (p == ebuf) {
+			yyerror("too long line");
+			p = buf;
+		}
+		escape = 0;
+	}
+
+eow:
+	*p = 0;
+	if (c != EOF)
+		ungetc(c, yyfp);
+	if (p == buf) {
+		/*
+		 * There could be a number of reasons for empty buffer,
+		 * and we handle all of them here, to avoid cluttering
+		 * the main loop.
+		 */
+		if (c == EOF)
+			goto eof;
+		else if (qpos == -1)    /* accept, e.g., empty args: cmd foo args "" */
+			goto repeat;
+	}
+	if (!nonkw) {
+		for (i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++) {
+			if (strcmp(buf, keywords[i].word) == 0)
+				return keywords[i].token;
+		}
+	}
+	if ((str = strdup(buf)) == NULL)
+		err(1, "%s", __func__);
+	yylval.str = str;
+	return TSTRING;
+
+eof:
+	if (ferror(yyfp))
+		yyerror("input error reading config");
+	return 0;
+}
 
 /*----------.
 | yyparse.  |
@@ -1605,164 +1754,4 @@ yyreturnlab:
 #endif
 
   return yyresult;
-}
-
-#line 195 "parse.y"
-
-
-void
-yyerror(const char *fmt, ...)
-{
-	va_list va;
-
-	fprintf(stderr, "doas: ");
-	va_start(va, fmt);
-	vfprintf(stderr, fmt, va);
-	va_end(va);
-	fprintf(stderr, " at line %d\n", yylval.lineno + 1);
-	parse_errors++;
-}
-
-static struct keyword {
-	const char *word;
-	int token;
-} keywords[] = {
-	{ "deny", TDENY },
-	{ "permit", TPERMIT },
-	{ "as", TAS },
-	{ "cmd", TCMD },
-	{ "args", TARGS },
-	{ "nopass", TNOPASS },
-	{ "nolog", TNOLOG },
-	{ "persist", TPERSIST },
-	{ "keepenv", TKEEPENV },
-	{ "setenv", TSETENV },
-};
-
-int
-yylex(void)
-{
-	char buf[1024], *ebuf, *p, *str;
-	int c, quotes = 0, escape = 0, qpos = -1, nonkw = 0;
-	size_t i;
-
-	p = buf;
-	ebuf = buf + sizeof(buf);
-
-repeat:
-	/* skip whitespace first */
-	for (c = getc(yyfp); c == ' ' || c == '\t'; c = getc(yyfp))
-		yylval.colno++;
-
-	/* check for special one-character constructions */
-	switch (c) {
-		case '\n':
-			yylval.colno = 0;
-			yylval.lineno++;
-			/* FALLTHROUGH */
-		case '{':
-		case '}':
-			return c;
-		case '#':
-			/* skip comments; NUL is allowed; no continuation */
-			while ((c = getc(yyfp)) != '\n')
-				if (c == EOF)
-					goto eof;
-			yylval.colno = 0;
-			yylval.lineno++;
-			return c;
-		case EOF:
-			goto eof;
-	}
-
-	/* parsing next word */
-	for (;; c = getc(yyfp), yylval.colno++) {
-		switch (c) {
-		case '\0':
-			yyerror("unallowed character NUL in column %d",
-			    yylval.colno + 1);
-			escape = 0;
-			continue;
-		case '\\':
-			escape = !escape;
-			if (escape)
-				continue;
-			break;
-		case '\n':
-			if (quotes)
-				yyerror("unterminated quotes in column %d",
-				    qpos + 1);
-			if (escape) {
-				nonkw = 1;
-				escape = 0;
-				yylval.colno = 0;
-				yylval.lineno++;
-				continue;
-			}
-			goto eow;
-		case EOF:
-			if (escape)
-				yyerror("unterminated escape in column %d",
-				    yylval.colno);
-			if (quotes)
-				yyerror("unterminated quotes in column %d",
-				    qpos + 1);
-			goto eow;
-			/* FALLTHROUGH */
-		case '{':
-		case '}':
-		case '#':
-		case ' ':
-		case '\t':
-			if (!escape && !quotes)
-				goto eow;
-			break;
-		case '"':
-			if (!escape) {
-				quotes = !quotes;
-				if (quotes) {
-					nonkw = 1;
-					qpos = yylval.colno;
-				}
-				continue;
-			}
-		}
-		*p++ = c;
-		if (p == ebuf) {
-			yyerror("too long line");
-			p = buf;
-		}
-		escape = 0;
-	}
-
-eow:
-	*p = 0;
-	if (c != EOF)
-		ungetc(c, yyfp);
-	if (p == buf) {
-		/*
-		 * There could be a number of reasons for empty buffer,
-		 * and we handle all of them here, to avoid cluttering
-		 * the main loop.
-		 */
-		if (c == EOF)
-			goto eof;
-		else if (qpos == -1)    /* accept, e.g., empty args: cmd foo args "" */
-			goto repeat;
-	}
-	if (!nonkw) {
-		for (i = 0; i < sizeof(keywords) / sizeof(keywords[0]); i++) {
-			if (strcmp(buf, keywords[i].word) == 0)
-				return keywords[i].token;
-		}
-	}
-	if ((str = strdup(buf)) == NULL)
-		err(1, "%s", __func__);
-	yylval.str = str;
-	return TSTRING;
-
-eof:
-	if (ferror(yyfp))
-		yyerror("input error reading config");
-	return 0;
 }

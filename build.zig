@@ -17,29 +17,18 @@ pub fn build(b: *std.Build) void {
 
     const saka = b.addExecutable(.{
         .name = "saka",
-        // .root_source_file = .{ .path = "src/main.zig" },
+        // .root_source_file = .{ .path = "src/doas.zig" },
         .target = target,
         .optimize = optimize,
     });
 
     saka.linkLibC();
     saka.linkSystemLibrary("crypt");
-    // redis_server.linkLibrary(hiredis);
-    // redis_server.addIncludeDir("deps/hiredis");
     // redis_server.addIncludeDir("deps/lua/src");
     saka.addCSourceFiles(&.{
         "src/doas.c",
-        "src/env.c",
-        // "src/pam.c",
-        "src/shadow.c",
-        "src/timestamp.c",
-        "src/parse.c",
-
         "include/libopenbsd/errc.c",
         "include/libopenbsd/verrc.c",
-        "include/libopenbsd/progname.c",
-        "include/libopenbsd/readpassphrase.c",
-        "include/libopenbsd/strtonum.c",
     }, &.{
         "-std=c11",
         "-pedantic",
@@ -47,28 +36,88 @@ pub fn build(b: *std.Build) void {
         "-W",
         "-Wno-missing-field-initializers",
         "-fno-sanitize=undefined",
-
-        //
         "-Wextra",
         "-Isrc",
         "-Iinclude/libopenbsd",
         "-D__linux__",
         "-D_DEFAULT_SOURCE",
         "-D_GNU_SOURCE",
+        //
     });
 
-    // const addon = b.addStaticLibrary(.{
-    //     .name = "addon",
-    //     // add file
-    //     .target = target,
-    // });
-    // addon.linkLibC();
-    // addon.addIncludeDir("src");
-    // addon.addIncludeDir("deps/hiredis");
-    // addon.addIncludeDir("deps/lua/src");
-    //
-    // Add where the `redis_server` step is being defined
-    // saka.linkLibrary(addon);
+    const progname = b.addStaticLibrary(.{
+        .name = "progname",
+        .root_source_file = .{ .path = "src/include/progname.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    progname.linkLibC();
+    saka.linkLibrary(progname);
+
+    const readpassphrase = b.addStaticLibrary(.{
+        .name = "readpassphrase",
+        .root_source_file = .{ .path = "src/include/readpassphrase.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    readpassphrase.linkLibC();
+    saka.linkLibrary(readpassphrase);
+
+    const strtonum = b.addStaticLibrary(.{
+        .name = "strtonum",
+        .root_source_file = .{ .path = "src/include/strtonum.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    strtonum.linkLibC();
+    saka.linkLibrary(strtonum);
+
+    const parse = b.addStaticLibrary(.{
+        .name = "env",
+        .root_source_file = .{ .path = "src/parse.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    parse.linkLibC();
+
+    const env = b.addStaticLibrary(.{
+        .name = "env",
+        .root_source_file = .{ .path = "src/env.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    env.linkLibC();
+
+    const timestamp = b.addStaticLibrary(.{
+        .name = "timestamp",
+        .root_source_file = .{ .path = "src/timestamp.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    timestamp.linkLibC();
+
+    const pam = b.addStaticLibrary(.{
+        .name = "pam",
+        .root_source_file = .{ .path = "src/pam.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    pam.linkLibC();
+    pam.linkSystemLibrary("pam");
+
+    const shadow = b.addStaticLibrary(.{
+        .name = "shadow",
+        .root_source_file = .{ .path = "src/shadow.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    shadow.linkLibC();
+
+    saka.linkLibrary(env);
+    saka.linkLibrary(parse);
+    saka.linkLibrary(timestamp);
+    saka.linkLibrary(pam);
+    saka.linkLibrary(shadow);
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default

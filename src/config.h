@@ -28,9 +28,16 @@
 /* #define HAVE_NDIR_H */
 /* #define HAVE_LOGIN_CAP_H */
 #define HAVE___ATTRIBUTE__
-/* #define HAVE_PAM_APPL_H */
-#define HAVE_SHADOW_H
-#define USE_SHADOW
+
+
+// Pick either
+// 1:
+// #define HAVE_SHADOW_H
+// #define USE_SHADOW
+// 2:
+#define HAVE_PAM_APPL_H
+#define USE_PAM
+
 #define DOAS_CONF "/etc/doas.conf"
 
 #endif /* CONFIG_H */
