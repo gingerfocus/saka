@@ -2,36 +2,46 @@
   description = "Rust environment for fish game";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-unstable";
-    utils.url = "github:numtide/flake-utils";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    zig-pkgs.url = "nixpkgs/nixos-unstable";
   };
 
   outputs = {
     self,
     nixpkgs,
-    utils,
-  }:
-    utils.lib.eachDefaultSystem (system: let
+    zig-pkgs
+  }: let
+    lib = nixpkgs.lib;
+    systems = [ "aarch64-linux" "x86_64-linux" ];
+    eachSystem = f: lib.foldAttrs lib.mergeAttrs { } (map (s: lib.mapAttrs (_: v: { ${s} = v; }) (f s)) systems);
+  in
+    eachSystem (system: let
       pkgs = import nixpkgs {inherit system;};
-      packages = with pkgs; [
-        openpam
-        libxcrypt
-      ];
-
-      version = "0.0.1";
+      # zig = (import zig-pkgs {inherit system;}).zig;
+      zig = pkgs.zig;
     in {
       # Build the package
       packages = rec {
         default = pkgs.stdenv.mkDerivation {
           pname = "saka";
           version = "0.0.1";
+
           src = ./.;
 
-          buildInputs = packages;
-          buildPhase = "${pkgs.zig}/bin/zig build --prefix $out --cache-dir /build/zig-cache --global-cache-dir /build/global-cache";
+          nativeBuildInputs = [ zig ];
+
+          buildInputs = with pkgs; [
+            # openpam
+            # shadow
+            libxcrypt
+            libbsd
+          ];
+
+          buildPhase = "${zig}/bin/zig build --prefix $out --cache-dir /build/zig-cache --global-cache-dir /build/global-cache";
           installPhase = ''
-            chown root:root $out/bin/saka
-            chmod 4755 $out/bin/saka
+            # chown root:root $out/bin/saka
+            # sudo chmod u+s $out/bin/saka
+            # chmod 4755 $out/bin/saka
           '';
 
           meta = {

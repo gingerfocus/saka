@@ -1,57 +1,3 @@
-pub const __builtin_bswap16 = @import("std").zig.c_builtins.__builtin_bswap16;
-pub const __builtin_bswap32 = @import("std").zig.c_builtins.__builtin_bswap32;
-pub const __builtin_bswap64 = @import("std").zig.c_builtins.__builtin_bswap64;
-pub const __builtin_signbit = @import("std").zig.c_builtins.__builtin_signbit;
-pub const __builtin_signbitf = @import("std").zig.c_builtins.__builtin_signbitf;
-pub const __builtin_popcount = @import("std").zig.c_builtins.__builtin_popcount;
-pub const __builtin_ctz = @import("std").zig.c_builtins.__builtin_ctz;
-pub const __builtin_clz = @import("std").zig.c_builtins.__builtin_clz;
-pub const __builtin_sqrt = @import("std").zig.c_builtins.__builtin_sqrt;
-pub const __builtin_sqrtf = @import("std").zig.c_builtins.__builtin_sqrtf;
-pub const __builtin_sin = @import("std").zig.c_builtins.__builtin_sin;
-pub const __builtin_sinf = @import("std").zig.c_builtins.__builtin_sinf;
-pub const __builtin_cos = @import("std").zig.c_builtins.__builtin_cos;
-pub const __builtin_cosf = @import("std").zig.c_builtins.__builtin_cosf;
-pub const __builtin_exp = @import("std").zig.c_builtins.__builtin_exp;
-pub const __builtin_expf = @import("std").zig.c_builtins.__builtin_expf;
-pub const __builtin_exp2 = @import("std").zig.c_builtins.__builtin_exp2;
-pub const __builtin_exp2f = @import("std").zig.c_builtins.__builtin_exp2f;
-pub const __builtin_log = @import("std").zig.c_builtins.__builtin_log;
-pub const __builtin_logf = @import("std").zig.c_builtins.__builtin_logf;
-pub const __builtin_log2 = @import("std").zig.c_builtins.__builtin_log2;
-pub const __builtin_log2f = @import("std").zig.c_builtins.__builtin_log2f;
-pub const __builtin_log10 = @import("std").zig.c_builtins.__builtin_log10;
-pub const __builtin_log10f = @import("std").zig.c_builtins.__builtin_log10f;
-pub const __builtin_abs = @import("std").zig.c_builtins.__builtin_abs;
-pub const __builtin_fabs = @import("std").zig.c_builtins.__builtin_fabs;
-pub const __builtin_fabsf = @import("std").zig.c_builtins.__builtin_fabsf;
-pub const __builtin_floor = @import("std").zig.c_builtins.__builtin_floor;
-pub const __builtin_floorf = @import("std").zig.c_builtins.__builtin_floorf;
-pub const __builtin_ceil = @import("std").zig.c_builtins.__builtin_ceil;
-pub const __builtin_ceilf = @import("std").zig.c_builtins.__builtin_ceilf;
-pub const __builtin_trunc = @import("std").zig.c_builtins.__builtin_trunc;
-pub const __builtin_truncf = @import("std").zig.c_builtins.__builtin_truncf;
-pub const __builtin_round = @import("std").zig.c_builtins.__builtin_round;
-pub const __builtin_roundf = @import("std").zig.c_builtins.__builtin_roundf;
-pub const __builtin_strlen = @import("std").zig.c_builtins.__builtin_strlen;
-pub const __builtin_strcmp = @import("std").zig.c_builtins.__builtin_strcmp;
-pub const __builtin_object_size = @import("std").zig.c_builtins.__builtin_object_size;
-pub const __builtin___memset_chk = @import("std").zig.c_builtins.__builtin___memset_chk;
-pub const __builtin_memset = @import("std").zig.c_builtins.__builtin_memset;
-pub const __builtin___memcpy_chk = @import("std").zig.c_builtins.__builtin___memcpy_chk;
-pub const __builtin_memcpy = @import("std").zig.c_builtins.__builtin_memcpy;
-pub const __builtin_expect = @import("std").zig.c_builtins.__builtin_expect;
-pub const __builtin_nanf = @import("std").zig.c_builtins.__builtin_nanf;
-pub const __builtin_huge_valf = @import("std").zig.c_builtins.__builtin_huge_valf;
-pub const __builtin_inff = @import("std").zig.c_builtins.__builtin_inff;
-pub const __builtin_isnan = @import("std").zig.c_builtins.__builtin_isnan;
-pub const __builtin_isinf = @import("std").zig.c_builtins.__builtin_isinf;
-pub const __builtin_isinf_sign = @import("std").zig.c_builtins.__builtin_isinf_sign;
-pub const __has_builtin = @import("std").zig.c_builtins.__has_builtin;
-pub const __builtin_assume = @import("std").zig.c_builtins.__builtin_assume;
-pub const __builtin_unreachable = @import("std").zig.c_builtins.__builtin_unreachable;
-pub const __builtin_constant_p = @import("std").zig.c_builtins.__builtin_constant_p;
-pub const __builtin_mul_overflow = @import("std").zig.c_builtins.__builtin_mul_overflow;
 pub const __u_char = u8;
 pub const __u_short = c_ushort;
 pub const __u_int = c_uint;
@@ -153,30 +99,6 @@ pub const u_int16_t = __uint16_t;
 pub const u_int32_t = __uint32_t;
 pub const u_int64_t = __uint64_t;
 pub const register_t = c_long;
-pub fn __bswap_16(arg___bsx: __uint16_t) callconv(.C) __uint16_t {
-    var __bsx = arg___bsx;
-    return @as(__uint16_t, @bitCast(@as(c_short, @truncate(((@as(c_int, @bitCast(@as(c_uint, __bsx))) >> @intCast(8)) & @as(c_int, 255)) | ((@as(c_int, @bitCast(@as(c_uint, __bsx))) & @as(c_int, 255)) << @intCast(8))))));
-}
-pub fn __bswap_32(arg___bsx: __uint32_t) callconv(.C) __uint32_t {
-    var __bsx = arg___bsx;
-    return ((((__bsx & @as(c_uint, 4278190080)) >> @intCast(24)) | ((__bsx & @as(c_uint, 16711680)) >> @intCast(8))) | ((__bsx & @as(c_uint, 65280)) << @intCast(8))) | ((__bsx & @as(c_uint, 255)) << @intCast(24));
-}
-pub fn __bswap_64(arg___bsx: __uint64_t) callconv(.C) __uint64_t {
-    var __bsx = arg___bsx;
-    return @as(__uint64_t, @bitCast(@as(c_ulong, @truncate(((((((((@as(c_ulonglong, @bitCast(@as(c_ulonglong, __bsx))) & @as(c_ulonglong, 18374686479671623680)) >> @intCast(56)) | ((@as(c_ulonglong, @bitCast(@as(c_ulonglong, __bsx))) & @as(c_ulonglong, 71776119061217280)) >> @intCast(40))) | ((@as(c_ulonglong, @bitCast(@as(c_ulonglong, __bsx))) & @as(c_ulonglong, 280375465082880)) >> @intCast(24))) | ((@as(c_ulonglong, @bitCast(@as(c_ulonglong, __bsx))) & @as(c_ulonglong, 1095216660480)) >> @intCast(8))) | ((@as(c_ulonglong, @bitCast(@as(c_ulonglong, __bsx))) & @as(c_ulonglong, 4278190080)) << @intCast(8))) | ((@as(c_ulonglong, @bitCast(@as(c_ulonglong, __bsx))) & @as(c_ulonglong, 16711680)) << @intCast(24))) | ((@as(c_ulonglong, @bitCast(@as(c_ulonglong, __bsx))) & @as(c_ulonglong, 65280)) << @intCast(40))) | ((@as(c_ulonglong, @bitCast(@as(c_ulonglong, __bsx))) & @as(c_ulonglong, 255)) << @intCast(56))))));
-}
-pub fn __uint16_identity(arg___x: __uint16_t) callconv(.C) __uint16_t {
-    var __x = arg___x;
-    return __x;
-}
-pub fn __uint32_identity(arg___x: __uint32_t) callconv(.C) __uint32_t {
-    var __x = arg___x;
-    return __x;
-}
-pub fn __uint64_identity(arg___x: __uint64_t) callconv(.C) __uint64_t {
-    var __x = arg___x;
-    return __x;
-}
 pub const __sigset_t = extern struct {
     __val: [16]c_ulong,
 };
@@ -1829,10 +1751,11 @@ pub export fn pamauth(arg_user: [*c]const u8, arg_myname: [*c]const u8, arg_inte
 pub var pamh: ?*pam_handle_t = null;
 pub var doas_prompt: [128]u8 = @import("std").mem.zeroes([128]u8);
 pub var caught_signal: sig_atomic_t = 0;
-pub fn catchsig(arg_sig: c_int) callconv(.C) void {
-    var sig = arg_sig;
+
+pub fn catchsig(sig: c_int) void {
     caught_signal = sig;
 }
+
 pub fn pamprompt(arg_msg: [*c]const u8, arg_echo_on: c_int, arg_ret: [*c]c_int) callconv(.C) [*c]u8 {
     var msg = arg_msg;
     var echo_on = arg_echo_on;
@@ -1860,15 +1783,16 @@ pub fn pamprompt(arg_msg: [*c]const u8, arg_echo_on: c_int, arg_ret: [*c]c_int) 
     }
     explicit_bzero(@as(?*anyopaque, @ptrCast(@as([*c]u8, @ptrCast(@alignCast(&buf))))), @sizeOf([512]u8));
     return pass;
-} // pam.c:102:5: warning: TODO implement translation of stmt class GotoStmtClass
+}
 
-pub fn pamconv(arg_nmsgs: c_int, arg_msgs: [*c][*c]const struct_pam_message, arg_rsps: [*c][*c]struct_pam_response, arg_ptr: ?*anyopaque) callconv(.C) c_int {
+pub fn pamconv(nmsgs: c_int, arg_msgs: [*c][*c]const struct_pam_message, arg_rsps: [*c][*c]struct_pam_response, arg_ptr: ?*anyopaque) callconv(.C) c_int {
     _ = arg_ptr;
     _ = arg_rsps;
     _ = arg_msgs;
-    _ = arg_nmsgs;
+    _ = nmsgs;
+    var rsp: *pam_response = undefined;
+    _ = rsp;
     @panic("unimplemented");
-    // 	struct pam_response *rsp;
     // 	int i, style;
     // 	int ret;
     //
@@ -1917,6 +1841,7 @@ pub fn pamconv(arg_nmsgs: c_int, arg_msgs: [*c][*c]const struct_pam_message, arg
     //
     // 	return PAM_CONV_ERR;
 }
+
 pub export fn pamcleanup(arg_ret: c_int, arg_sess: c_int, arg_cred: c_int) void {
     var ret = arg_ret;
     var sess = arg_sess;
@@ -1934,7 +1859,7 @@ pub export fn pamcleanup(arg_ret: c_int, arg_sess: c_int, arg_cred: c_int) void 
         }
     }
     _ = pam_end(pamh, ret);
-} // pam.c:168:3: warning: TODO implement translation of stmt class GotoStmtClass
+}
 
 pub fn watchsession(arg_child: pid_t, arg_sess: c_int, arg_cred: c_int) void {
     _ = arg_cred;
@@ -2623,9 +2548,6 @@ pub inline fn __GLIBC_PREREQ(maj: anytype, min: anytype) @TypeOf(((__GLIBC__ << 
     return ((__GLIBC__ << @as(c_int, 16)) + __GLIBC_MINOR__) >= ((maj << @as(c_int, 16)) + min);
 }
 pub const _SYS_CDEFS_H = @as(c_int, 1);
-pub inline fn __glibc_has_builtin(name: anytype) @TypeOf(__has_builtin(name)) {
-    return __has_builtin(name);
-}
 pub const __LEAF = "";
 pub const __LEAF_ATTR = "";
 pub inline fn __P(args: anytype) @TypeOf(args) {
@@ -2637,18 +2559,6 @@ pub inline fn __PMT(args: anytype) @TypeOf(args) {
 pub const __ptr_t = ?*anyopaque;
 pub const __BEGIN_DECLS = "";
 pub const __END_DECLS = "";
-pub inline fn __bos(ptr: anytype) @TypeOf(__builtin_object_size(ptr, __USE_FORTIFY_LEVEL > @as(c_int, 1))) {
-    return __builtin_object_size(ptr, __USE_FORTIFY_LEVEL > @as(c_int, 1));
-}
-pub inline fn __bos0(ptr: anytype) @TypeOf(__builtin_object_size(ptr, @as(c_int, 0))) {
-    return __builtin_object_size(ptr, @as(c_int, 0));
-}
-pub inline fn __glibc_objsize0(__o: anytype) @TypeOf(__bos0(__o)) {
-    return __bos0(__o);
-}
-pub inline fn __glibc_objsize(__o: anytype) @TypeOf(__bos(__o)) {
-    return __bos(__o);
-}
 pub const __glibc_c99_flexarr_available = @as(c_int, 1);
 pub inline fn __ASMNAME(cname: anytype) @TypeOf(__ASMNAME2(__USER_LABEL_PREFIX__, cname)) {
     return __ASMNAME2(__USER_LABEL_PREFIX__, cname);
@@ -2660,12 +2570,6 @@ pub inline fn __nonnull(params: anytype) @TypeOf(__attribute_nonnull__(params)) 
 }
 pub const __wur = "";
 pub const __fortify_function = __extern_always_inline ++ __attribute_artificial__;
-pub inline fn __glibc_unlikely(cond: anytype) @TypeOf(__builtin_expect(cond, @as(c_int, 0))) {
-    return __builtin_expect(cond, @as(c_int, 0));
-}
-pub inline fn __glibc_likely(cond: anytype) @TypeOf(__builtin_expect(cond, @as(c_int, 1))) {
-    return __builtin_expect(cond, @as(c_int, 1));
-}
 pub const __attribute_nonstring__ = "";
 pub const __LDOUBLE_REDIRECTS_TO_FLOAT128_ABI = @as(c_int, 0);
 pub inline fn __LDBL_REDIR1(name: anytype, proto: anytype, alias: anytype) @TypeOf(name ++ proto) {
@@ -2810,42 +2714,6 @@ pub inline fn __bswap_constant_64(x: anytype) @TypeOf(((((((((x & @as(c_ulonglon
     return ((((((((x & @as(c_ulonglong, 0xff00000000000000)) >> @as(c_int, 56)) | ((x & @as(c_ulonglong, 0x00ff000000000000)) >> @as(c_int, 40))) | ((x & @as(c_ulonglong, 0x0000ff0000000000)) >> @as(c_int, 24))) | ((x & @as(c_ulonglong, 0x000000ff00000000)) >> @as(c_int, 8))) | ((x & @as(c_ulonglong, 0x00000000ff000000)) << @as(c_int, 8))) | ((x & @as(c_ulonglong, 0x0000000000ff0000)) << @as(c_int, 24))) | ((x & @as(c_ulonglong, 0x000000000000ff00)) << @as(c_int, 40))) | ((x & @as(c_ulonglong, 0x00000000000000ff)) << @as(c_int, 56));
 }
 pub const _BITS_UINTN_IDENTITY_H = @as(c_int, 1);
-pub inline fn htobe16(x: anytype) @TypeOf(__bswap_16(x)) {
-    return __bswap_16(x);
-}
-pub inline fn htole16(x: anytype) @TypeOf(__uint16_identity(x)) {
-    return __uint16_identity(x);
-}
-pub inline fn be16toh(x: anytype) @TypeOf(__bswap_16(x)) {
-    return __bswap_16(x);
-}
-pub inline fn le16toh(x: anytype) @TypeOf(__uint16_identity(x)) {
-    return __uint16_identity(x);
-}
-pub inline fn htobe32(x: anytype) @TypeOf(__bswap_32(x)) {
-    return __bswap_32(x);
-}
-pub inline fn htole32(x: anytype) @TypeOf(__uint32_identity(x)) {
-    return __uint32_identity(x);
-}
-pub inline fn be32toh(x: anytype) @TypeOf(__bswap_32(x)) {
-    return __bswap_32(x);
-}
-pub inline fn le32toh(x: anytype) @TypeOf(__uint32_identity(x)) {
-    return __uint32_identity(x);
-}
-pub inline fn htobe64(x: anytype) @TypeOf(__bswap_64(x)) {
-    return __bswap_64(x);
-}
-pub inline fn htole64(x: anytype) @TypeOf(__uint64_identity(x)) {
-    return __uint64_identity(x);
-}
-pub inline fn be64toh(x: anytype) @TypeOf(__bswap_64(x)) {
-    return __bswap_64(x);
-}
-pub inline fn le64toh(x: anytype) @TypeOf(__uint64_identity(x)) {
-    return __uint64_identity(x);
-}
 pub const _SYS_SELECT_H = @as(c_int, 1);
 pub inline fn __FD_ISSET(d: anytype, s: anytype) @TypeOf((__FDS_BITS(s)[@as(usize, @intCast(__FD_ELT(d)))] & __FD_MASK(d)) != @as(c_int, 0)) {
     return (__FDS_BITS(s)[@as(usize, @intCast(__FD_ELT(d)))] & __FD_MASK(d)) != @as(c_int, 0);
@@ -3248,15 +3116,6 @@ pub inline fn __f32x(x: anytype) @TypeOf(x) {
     return x;
 }
 pub const __f64x = @import("std").zig.c_translation.Macros.L_SUFFIX;
-pub inline fn __builtin_huge_valf32() @TypeOf(__builtin_huge_valf()) {
-    return __builtin_huge_valf();
-}
-pub inline fn __builtin_inff32() @TypeOf(__builtin_inff()) {
-    return __builtin_inff();
-}
-pub inline fn __builtin_nanf32(x: anytype) @TypeOf(__builtin_nanf(x)) {
-    return __builtin_nanf(x);
-}
 pub const _ERRNO_H = @as(c_int, 1);
 pub const _BITS_ERRNO_H = @as(c_int, 1);
 pub const _ASM_GENERIC_ERRNO_H = "";

@@ -32,12 +32,12 @@
 
 // Pick either
 // 1:
-// #define HAVE_SHADOW_H
-// #define USE_SHADOW
+#define HAVE_SHADOW_H
+#define USE_SHADOW
 // 2:
-#define HAVE_PAM_APPL_H
-#define USE_PAM
+// #define HAVE_PAM_APPL_H
+// #define USE_PAM
 
-#define DOAS_CONF "/etc/doas.conf"
+#define DOAS_CONF "/home/focus/dev/saka/doas.conf"
 
 #endif /* CONFIG_H */
