@@ -1,7 +1,5 @@
 {
-  description = "Rust environment for fish game";
-
-  inputs.nixpkgs.url = "nixpkgs";
+  inputs.nixpkgs.url = "nixpkgs-unstable";
 
   outputs = { self, nixpkgs }: let
     lib = nixpkgs.lib;
@@ -11,7 +9,6 @@
     eachSystem (system: let
       pkgs = import nixpkgs {inherit system;};
     in {
-      # Build the package
       packages = rec {
         default = pkgs.stdenv.mkDerivation {
           pname = "saka";
@@ -21,8 +18,6 @@
 
           nativeBuildInputs = with pkgs; [ zig.hook ];
           buildInputs = with pkgs; [ openpam libxcrypt libbsd ];
-
-          # buildPhase = "${pkgs.zig}/bin/zig build --prefix $out --cache-dir /build/zig-cache --global-cache-dir /build/global-cache";
 
           meta = {
             maintainers = ["Evan Stokdyk <evan.stokdyk@gmail.com>"];

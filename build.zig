@@ -59,6 +59,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+
     const sakaRunTest = b.addRunArtifact(sakaTest);
     const tests = b.step("test", "Run unit tests");
     tests.dependOn(&sakaRunTest.step);

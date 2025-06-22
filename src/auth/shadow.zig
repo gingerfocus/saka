@@ -27,7 +27,7 @@ pub fn checkshadow(myname: [:0]const u8, persist: bool) bool {
         return false;
     };
 
-    var hash: [*:0]const u8 = pw.pw_passwd orelse {
+    var hash: [*:0]const u8 = pw.passwd orelse {
         std.log.err("getpwnam", .{});
         return false;
     };

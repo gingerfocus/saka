@@ -85,7 +85,7 @@ pub fn main() !u8 {
             // unqualified file, fetch it from path
             else getpath(path, arg1) orelse return die(1, "execv", "cannot find program");
 
-            std.debug.print("path: {s}\n", .{cmd});
+            // std.debug.print("path: {s}\n", .{cmd});
 
             var st = mem.zeroes(std.posix.Stat);
             if (std.os.linux.lstat(@ptrCast(cmd.ptr), &st) != 0)
@@ -125,7 +125,7 @@ test "find basic things" {
             const a = std.testing.allocator;
             const output = try std.process.Child.run(.{
                 .allocator = a,
-                .argv = &.{ "bash", "-c", "realpath " ++ inpath },
+                .argv = &.{ "realpath", inpath },
             });
             defer a.free(output.stdout);
             defer a.free(output.stderr);

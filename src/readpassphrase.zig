@@ -77,8 +77,8 @@ pub fn readpassphrase(prompt: []const u8, buf: []u8, flags: Flags) ![:0]u8 {
             term.lflag.ECHONL = false;
         }
         // #ifdef VSTATUS
-        // 		if (term.c_cc[VSTATUS] != _POSIX_VDISABLE)
-        // 			term.c_cc[VSTATUS] = _POSIX_VDISABLE;
+        //   if (term.c_cc[VSTATUS] != _POSIX_VDISABLE)
+        //    term.c_cc[VSTATUS] = _POSIX_VDISABLE;
         // #endif
         try posix.tcsetattr(fd, posix.TCSA.FLUSH, term);
     }
@@ -99,7 +99,7 @@ pub fn readpassphrase(prompt: []const u8, buf: []u8, flags: Flags) ![:0]u8 {
 
     // install signals
     for (&sigs) |*sig|
-        posix.sigaction(sig.sig, &sa, &sig.buf) catch unreachable;
+        posix.sigaction(sig.sig, &sa, &sig.buf);
 
     _ = posix.write(if (hastty) fd else 2, prompt) catch 0; // posix.STDERR_FILENO
 
@@ -145,7 +145,7 @@ pub fn readpassphrase(prompt: []const u8, buf: []u8, flags: Flags) ![:0]u8 {
 
     // restore signals
     for (sigs) |sig|
-        posix.sigaction(sig.sig, &sig.buf, null) catch unreachable;
+        posix.sigaction(sig.sig, &sig.buf, null);
 
     // If we were interrupted by a signal, resend it to ourselves
     // now that we have restored the signal handlers.

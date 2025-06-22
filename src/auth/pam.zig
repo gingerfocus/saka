@@ -22,9 +22,9 @@
 // #include <limits.h>
 // #include <pwd.h>
 // #ifdef HAVE_READPASSPHRASE
-// #	include <readpassphrase.h>
+// # include <readpassphrase.h>
 // #else
-// #	include "sys-readpassphrase.h"
+// # include "sys-readpassphrase.h"
 // #endif
 // #include <signal.h>
 // #include <stdio.h>
@@ -57,33 +57,33 @@ var pamh: ?*pam.pam_handle_t = null;
 // static void
 // catchsig(int sig)
 // {
-// 	caught_signal = sig;
+//   caught_signal = sig;
 // }
 
 // static char *
 // pamprompt(const char *msg, int echo_on, int *ret)
 // {
-// 	const char *prompt;
-// 	char *pass, buf[PAM_MAX_RESP_SIZE];
-// 	int flags = RPP_REQUIRE_TTY | (echo_on ? RPP_ECHO_ON : RPP_ECHO_OFF);
+//  const char *prompt;
+//  char *pass, buf[PAM_MAX_RESP_SIZE];
+//  int flags = RPP_REQUIRE_TTY | (echo_on ? RPP_ECHO_ON : RPP_ECHO_OFF);
 //
-// 	/* overwrite default prompt if it matches "Password:[ ]" */
-// 	if (strncmp(msg,"Password:", 9) == 0 &&
-// 	    (msg[9] == '\0' || (msg[9] == ' ' && msg[10] == '\0')))
-// 		prompt = doas_prompt;
-// 	else
-// 		prompt = msg;
+//  /* overwrite default prompt if it matches "Password:[ ]" */
+//  if (strncmp(msg,"Password:", 9) == 0 &&
+//      (msg[9] == '\0' || (msg[9] == ' ' && msg[10] == '\0')))
+//   prompt = doas_prompt;
+//  else
+//   prompt = msg;
 //
-// 	pass = readpassphrase(prompt, buf, sizeof(buf), flags);
-// 	if (!pass)
-// 		*ret = PAM_CONV_ERR;
-// 	else if (!(pass = strdup(pass)))
-// 		*ret = PAM_BUF_ERR;
-// 	else
-// 		*ret = PAM_SUCCESS;
+//  pass = readpassphrase(prompt, buf, sizeof(buf), flags);
+//  if (!pass)
+//   *ret = PAM_CONV_ERR;
+//  else if (!(pass = strdup(pass)))
+//   *ret = PAM_BUF_ERR;
+//  else
+//   *ret = PAM_SUCCESS;
 //
-// 	explicit_bzero(buf, sizeof(buf));
-// 	return pass;
+//  explicit_bzero(buf, sizeof(buf));
+//  return pass;
 // }
 
 fn pamconv(nmsgs: c_int, msgs: [*c][*c]const pam.pam_message, rsps: [*c][*c]pam.pam_response, ptr: ?*anyopaque) callconv(.C) c_int {
@@ -91,52 +91,52 @@ fn pamconv(nmsgs: c_int, msgs: [*c][*c]const pam.pam_message, rsps: [*c][*c]pam.
     _ = ptr; // autofix
     _ = nmsgs; // autofix
     _ = msgs; // autofix
-    // 	struct pam_response *rsp;
-    // 	int i, style;
-    // 	int ret;
+    //  struct pam_response *rsp;
+    //  int i, style;
+    //  int ret;
     //
-    // 	if (!(rsp = calloc(nmsgs, sizeof(struct pam_response))))
-    // 		err(1, "could not allocate pam_response");
+    //  if (!(rsp = calloc(nmsgs, sizeof(struct pam_response))))
+    //   err(1, "could not allocate pam_response");
     //
-    // 	for (i = 0; i < nmsgs; i++) {
-    // 		switch (style = msgs[i]->msg_style) {
-    // 		case PAM_PROMPT_ECHO_OFF:
-    // 		case PAM_PROMPT_ECHO_ON:
-    // 			rsp[i].resp = pamprompt(msgs[i]->msg, style == PAM_PROMPT_ECHO_ON, &ret);
-    // 			if (ret != PAM_SUCCESS)
-    // 				goto fail;
-    // 			break;
+    //  for (i = 0; i < nmsgs; i++) {
+    //   switch (style = msgs[i]->msg_style) {
+    //   case PAM_PROMPT_ECHO_OFF:
+    //   case PAM_PROMPT_ECHO_ON:
+    //    rsp[i].resp = pamprompt(msgs[i]->msg, style == PAM_PROMPT_ECHO_ON, &ret);
+    //    if (ret != PAM_SUCCESS)
+    //     goto fail;
+    //    break;
     //
-    // 		case PAM_ERROR_MSG:
-    // 		case PAM_TEXT_INFO:
-    // 			if (fprintf(stderr, "%s\n", msgs[i]->msg) < 0)
-    // 				goto fail;
-    // 			break;
+    //   case PAM_ERROR_MSG:
+    //   case PAM_TEXT_INFO:
+    //    if (fprintf(stderr, "%s\n", msgs[i]->msg) < 0)
+    //     goto fail;
+    //    break;
     //
-    // 		default:
-    // 			errx(1, "invalid PAM msg_style %d", style);
-    // 		}
-    // 	}
+    //   default:
+    //    errx(1, "invalid PAM msg_style %d", style);
+    //   }
+    //  }
     //
-    // 	*rsps = rsp;
-    // 	rsp = NULL;
+    //  *rsps = rsp;
+    //  rsp = NULL;
     //
     return pam.PAM_SUCCESS;
     //
     // fail:
-    // 	/* overwrite and free response buffers */
-    // 	for (i = 0; i < nmsgs; i++) {
-    // 		if (rsp[i].resp == NULL)
-    // 			continue;
-    // 		switch (msgs[i]->msg_style) {
-    // 		case PAM_PROMPT_ECHO_OFF:
-    // 		case PAM_PROMPT_ECHO_ON:
-    // 			explicit_bzero(rsp[i].resp, strlen(rsp[i].resp));
-    // 			free(rsp[i].resp);
-    // 		}
-    // 		rsp[i].resp = NULL;
-    // 	}
-    // 	free(rsp);
+    //  /* overwrite and free response buffers */
+    //  for (i = 0; i < nmsgs; i++) {
+    //   if (rsp[i].resp == NULL)
+    //    continue;
+    //   switch (msgs[i]->msg_style) {
+    //   case PAM_PROMPT_ECHO_OFF:
+    //   case PAM_PROMPT_ECHO_ON:
+    //    explicit_bzero(rsp[i].resp, strlen(rsp[i].resp));
+    //    free(rsp[i].resp);
+    //   }
+    //   rsp[i].resp = NULL;
+    //  }
+    //  free(rsp);
     // return pam.PAM_CONV_ERR;
 }
 
@@ -160,72 +160,72 @@ fn pamcleanup(arg_ret: c_int, sess: c_int, cred: bool) void {
 fn watchsession(child: std.posix.pid_t, sess: c_int, cred: bool) void {
     _ = child; // autofix
 
-    // 	sigset_t sigs;
-    // 	struct sigaction act, oldact;
+    //  sigset_t sigs;
+    //  struct sigaction act, oldact;
     var status: u8 = 1;
     status = 0;
 
     // block signals
-    // 	sigfillset(&sigs);
-    // 	if (sigprocmask(SIG_BLOCK, &sigs, NULL)) {
-    // 		warn("failed to block signals");
-    // 		caught_signal = 1;
-    // 		goto close;
-    // 	}
+    //  sigfillset(&sigs);
+    //  if (sigprocmask(SIG_BLOCK, &sigs, NULL)) {
+    //   warn("failed to block signals");
+    //   caught_signal = 1;
+    //   goto close;
+    //  }
     //
-    // 	/* setup signal handler */
-    // 	act.sa_handler = catchsig;
-    // 	sigemptyset(&act.sa_mask);
-    // 	act.sa_flags = 0;
+    //  /* setup signal handler */
+    //  act.sa_handler = catchsig;
+    //  sigemptyset(&act.sa_mask);
+    //  act.sa_flags = 0;
     //
-    // 	/* unblock SIGTERM and SIGALRM to catch them */
-    // 	sigemptyset(&sigs);
-    // 	if (sigaddset(&sigs, SIGTERM) ||
-    // 	    sigaddset(&sigs, SIGALRM) ||
-    // 	    sigaddset(&sigs, SIGTSTP) ||
-    // 	    sigaction(SIGTERM, &act, &oldact) ||
-    // 	    sigprocmask(SIG_UNBLOCK, &sigs, NULL)) {
-    // 		warn("failed to set signal handler");
-    // 		caught_signal = 1;
-    // 		goto close;
-    // 	}
+    //  /* unblock SIGTERM and SIGALRM to catch them */
+    //  sigemptyset(&sigs);
+    //  if (sigaddset(&sigs, SIGTERM) ||
+    //      sigaddset(&sigs, SIGALRM) ||
+    //      sigaddset(&sigs, SIGTSTP) ||
+    //      sigaction(SIGTERM, &act, &oldact) ||
+    //      sigprocmask(SIG_UNBLOCK, &sigs, NULL)) {
+    //   warn("failed to set signal handler");
+    //   caught_signal = 1;
+    //   goto close;
+    //  }
     //
-    // 	/* wait for child to be terminated */
-    // 	if (waitpid(child, &status, 0) != -1) {
-    // 		if (WIFSIGNALED(status)) {
-    // 			fprintf(stderr, "%s%s\n", strsignal(WTERMSIG(status)),
-    // 					WCOREDUMP(status) ? " (core dumped)" : "");
-    // 			status = WTERMSIG(status) + 128;
-    // 		} else
-    // 			status = WEXITSTATUS(status);
-    // 	}
-    // 	else if (caught_signal)
-    // 		status = caught_signal + 128;
-    // 	else
-    // 		status = 1;
+    //  /* wait for child to be terminated */
+    //  if (waitpid(child, &status, 0) != -1) {
+    //   if (WIFSIGNALED(status)) {
+    //    fprintf(stderr, "%s%s\n", strsignal(WTERMSIG(status)),
+    //      WCOREDUMP(status) ? " (core dumped)" : "");
+    //    status = WTERMSIG(status) + 128;
+    //   } else
+    //    status = WEXITSTATUS(status);
+    //  }
+    //  else if (caught_signal)
+    //   status = caught_signal + 128;
+    //  else
+    //   status = 1;
     //
     // close:
-    // 	if (caught_signal && child != (pid_t)-1) {
-    // 		fprintf(stderr, "\nSession terminated, killing shell\n");
-    // 		kill(child, SIGTERM);
-    // 	}
+    //  if (caught_signal && child != (pid_t)-1) {
+    //   fprintf(stderr, "\nSession terminated, killing shell\n");
+    //   kill(child, SIGTERM);
+    //  }
     //
     pamcleanup(pam.PAM_SUCCESS, sess, cred);
 
-    // 	if (caught_signal) {
-    // 		if (child != (pid_t)-1) {
-    // 			/* kill child */
-    // 			sleep(2);
-    // 			kill(child, SIGKILL);
-    // 			fprintf(stderr, " ...killed.\n");
-    // 		}
+    //  if (caught_signal) {
+    //   if (child != (pid_t)-1) {
+    //    /* kill child */
+    //    sleep(2);
+    //    kill(child, SIGKILL);
+    //    fprintf(stderr, " ...killed.\n");
+    //   }
     //
-    // 		/* unblock cached signal and resend */
-    // 		sigaction(SIGTERM, &oldact, NULL);
-    // 		if (caught_signal != SIGTERM)
-    // 			caught_signal = SIGKILL;
-    // 		kill(getpid(), caught_signal);
-    // 	}
+    //   /* unblock cached signal and resend */
+    //   sigaction(SIGTERM, &oldact, NULL);
+    //   if (caught_signal != SIGTERM)
+    //    caught_signal = SIGKILL;
+    //   kill(getpid(), caught_signal);
+    //  }
 
     std.posix.exit(status);
 }
@@ -244,10 +244,10 @@ pub fn checkpam(myname: []const u8, persist: bool) bool {
     var sess: c_int = 0;
 
     // #ifdef USE_TIMESTAMP
-    // 	int fd = -1;
-    // 	int valid = 0;
+    //  int fd = -1;
+    //  int valid = 0;
     // #else
-    // 	(void) persist;
+    //  (void) persist;
     // #endif
 
     var ret: c_int = undefined;
@@ -277,31 +277,31 @@ pub fn checkpam(myname: []const u8, persist: bool) bool {
     }
 
     // #ifdef USE_TIMESTAMP
-    // 	if (persist)
-    // 		fd = timestamp_open(&valid, 5 * 60);
-    // 	if (fd != -1 && valid == 1)
-    // 		nopass = 1;
+    //  if (persist)
+    //   fd = timestamp_open(&valid, 5 * 60);
+    //  if (fd != -1 && valid == 1)
+    //   nopass = 1;
     // #endif
 
-    // 	if (!nopass) {
-    // 		if (!interactive)
-    // 			errx(1, "Authentication required");
+    //  if (!nopass) {
+    //   if (!interactive)
+    //    errx(1, "Authentication required");
     //
-    // 		/* doas style prompt for pam */
-    // 		char host[HOST_NAME_MAX + 1];
-    // 		if (gethostname(host, sizeof(host)))
-    // 			snprintf(host, sizeof(host), "?");
-    // 		snprintf(doas_prompt, sizeof(doas_prompt),
-    // 		    "\rdoas (%.32s@%.32s) password: ", myname, host);
+    //   /* doas style prompt for pam */
+    //   char host[HOST_NAME_MAX + 1];
+    //   if (gethostname(host, sizeof(host)))
+    //    snprintf(host, sizeof(host), "?");
+    //   snprintf(doas_prompt, sizeof(doas_prompt),
+    //       "\rdoas (%.32s@%.32s) password: ", myname, host);
     //
-    // 		/* authenticate */
-    // 		ret = pam_authenticate(pamh, 0);
-    // 		if (ret != PAM_SUCCESS) {
-    // 			pamcleanup(ret, sess, cred);
-    // 			syslog(LOG_AUTHPRIV | LOG_NOTICE, "failed auth for %s", myname);
-    // 			errx(1, "Authentication failed");
-    // 		}
-    // 	}
+    //   /* authenticate */
+    //   ret = pam_authenticate(pamh, 0);
+    //   if (ret != PAM_SUCCESS) {
+    //    pamcleanup(ret, sess, cred);
+    //    syslog(LOG_AUTHPRIV | LOG_NOTICE, "failed auth for %s", myname);
+    //    errx(1, "Authentication failed");
+    //   }
+    //  }
 
     ret = pam.pam_acct_mgmt(pamh, 0);
     if (ret == pam.PAM_NEW_AUTHTOK_REQD)
@@ -320,8 +320,8 @@ pub fn checkpam(myname: []const u8, persist: bool) bool {
     // set PAM_USER to the user we want to be
     ret = pam.pam_set_item(pamh, pam.PAM_USER, user.ptr);
     if (ret != pam.PAM_SUCCESS) {
-        // 		warn("pam_set_item(?, PAM_USER, \"%s\"): %s", user,
-        // 		    pam_strerror(pamh, ret));
+        //   warn("pam_set_item(?, PAM_USER, \"%s\"): %s", user,
+        //       pam_strerror(pamh, ret));
     }
 
     ret = pam.pam_setcred(pamh, pam.PAM_REINITIALIZE_CRED);
@@ -345,17 +345,17 @@ pub fn checkpam(myname: []const u8, persist: bool) bool {
     // return as child
     if (child == 0) {
         // #ifdef USE_TIMESTAMP
-        // 		if (fd != -1)
-        // 			close(fd);
+        //   if (fd != -1)
+        //    close(fd);
         // #endif
         return false; // TODO: have special return for child
     }
 
     // #ifdef USE_TIMESTAMP
-    // 	if (fd != -1) {
-    // 		timestamp_set(fd, 5 * 60);
-    // 		close(fd);
-    // 	}
+    //  if (fd != -1) {
+    //   timestamp_set(fd, 5 * 60);
+    //   close(fd);
+    //  }
     // #endif
     watchsession(child, sess, cred);
     return false;
