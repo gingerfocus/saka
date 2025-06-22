@@ -1,10 +1,6 @@
 const std = @import("std");
 const mem = std.mem;
 
-const bsd = @cImport({
-    @cInclude("bsd/readpassphrase.h");
-});
-
 const shadow = @cImport({
     @cInclude("shadow.h");
 });
@@ -13,9 +9,9 @@ const crypt = @cImport({
     @cInclude("crypt.h");
 });
 
-pub const check = shadowauth;
+const rp = @import("../readpassphrase.zig");
 
-fn shadowauth(myname: []const u8, persist: bool) bool {
+pub fn checkshadow(myname: [:0]const u8, persist: bool) bool {
     if (persist) {
         // var valid = 0;
         // const fd = timestamp_open(&valid, 5 * 60);
@@ -41,6 +37,7 @@ fn shadowauth(myname: []const u8, persist: bool) bool {
 
         if (spwd) |sp| hash = sp.sp_pwdp else {
             std.log.err("Authentication failed", .{});
+            return false;
         }
     } else if (hash[0] != '*') {
         std.log.err("Authentication failed", .{});
@@ -54,18 +51,19 @@ fn shadowauth(myname: []const u8, persist: bool) bool {
     _ = std.fmt.bufPrint(&bprompt, "\rsaka ({s}@{s}) password: ", .{ myname, hostname }) catch unreachable;
 
     var rbuf: [1024]u8 = undefined;
-    defer @memset(&rbuf, 0); // TODO: make sure this is not optimized away
+    defer std.crypto.utils.secureZero(u8, &rbuf);
 
-    const response: [*:0]const u8 = bsd.readpassphrase(@ptrCast(&bprompt), @ptrCast(&rbuf), 1024, bsd.RPP_REQUIRE_TTY) orelse {
-        if (std.c._errno().* == @intFromEnum(std.posix.E.NOTTY)) {
+    const response = rp.readpassphrase(&bprompt, &rbuf, .{ .require_tty = true }) catch |err| switch (err) {
+        error.NOTTY => {
             // LOG_AUTHPRIV | LOG_NOTICE,
             std.c.syslog((@as(c_int, 10) << @intCast(3)) | @as(c_int, 5), "tty required for %s", myname.ptr);
             std.log.err("a tty is required", .{});
             return false;
-        } else {
+        },
+        else => {
             std.log.err("readpassphrase", .{});
             return false;
-        }
+        },
     };
 
     const encrypted: [*:0]u8 = crypt.crypt(response, hash) orelse {
@@ -74,8 +72,9 @@ fn shadowauth(myname: []const u8, persist: bool) bool {
     };
 
     if (std.mem.orderZ(u8, encrypted, hash) == .eq) {
+        // std.posix.LOG.NOTICE
         // LOG_AUTHPRIV | LOG_NOTICE,
-        std.c.syslog((@as(c_int, 10) << @intCast(3)) | @as(c_int, 5), "failed auth for %s", myname.ptr);
+        std.c.syslog((10 << 3) | 5, "failed auth for %s", myname.ptr);
         std.log.err("Authentication failed", .{});
         return false;
     }
