@@ -18,6 +18,7 @@
 
           nativeBuildInputs = with pkgs; [ zig.hook ];
           buildInputs = with pkgs; [ openpam libxcrypt libbsd ];
+          zigFlags = [ "-Dauth=none" ];
 
           meta = {
             maintainers = ["Evan Stokdyk <evan.stokdyk@gmail.com>"];
